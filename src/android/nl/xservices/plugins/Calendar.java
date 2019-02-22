@@ -657,7 +657,42 @@ public class Calendar extends CordovaPlugin {
           int i = 0;
           if (cursor != null) {
             while (cursor.moveToNext()) {
+              JSONArray attendee_result = new JSONArray();
+              int j = 0;
               try {
+                final String[] attendeeProjection = new String[]{
+                    CalendarContract.Attendees.EVENT_ID,
+                    CalendarContract.Attendees.ATTENDEE_NAME,
+                    CalendarContract.Attendees.ATTENDEE_EMAIL,
+                    CalendarContract.Attendees.ATTENDEE_TYPE,
+                    CalendarContract.Attendees.ATTENDEE_RELATIONSHIP,
+                    CalendarContract.Attendees.ATTENDEE_STATUS
+                };
+                final String event_id = cursor.getString(cursor.getColumnIndex(CalendarContract.Attendees.EVENT_ID));
+                final String[] args = new String[]{event_id};
+                final Cursor attendee_cursor = contentResolver.query(
+                    CalendarContract.Attendees.CONTENT_URI,
+                    attendeeProjection,
+                    "(" + CalendarContract.Attendees.EVENT_ID + " = ?)",
+                    args,
+                    CalendarContract.Attendees.ATTENDEE_EMAIL + " ASC"
+                );
+                
+                if(attendee_cursor != null) {
+                    while (attendee_cursor.moveToNext()) {
+                        attendee_result.put(
+                            j++,
+                            new JSONObject()
+                                    .put("event_id", attendee_cursor.getString(attendee_cursor.getColumnIndex(CalendarContract.Attendees.EVENT_ID)))
+                                    .put("name", attendee_cursor.getString(attendee_cursor.getColumnIndex(CalendarContract.Attendees.ATTENDEE_NAME)))
+                                    .put("type", attendee_cursor.getString(attendee_cursor.getColumnIndex(CalendarContract.Attendees.ATTENDEE_TYPE)))
+                                    .put("relationship", attendee_cursor.getString(attendee_cursor.getColumnIndex(CalendarContract.Attendees.ATTENDEE_RELATIONSHIP)))
+                                    .put("status", attendee_cursor.getInt(attendee_cursor.getColumnIndex(CalendarContract.Attendees.ATTENDEE_STATUS)))
+                        );
+                    }
+                }
+                attendee_cursor.close();
+                
                 result.put(
                         i++,
                         new JSONObject()
@@ -672,6 +707,7 @@ public class Calendar extends CordovaPlugin {
                                 .put("dtend", cursor.getLong(cursor.getColumnIndex("end")))
                                 .put("eventLocation", cursor.getString(cursor.getColumnIndex("eventLocation")) != null ? cursor.getString(cursor.getColumnIndex("eventLocation")) : "")
                                 .put("allDay", cursor.getInt(cursor.getColumnIndex("allDay")))
+                                .put("attendees", attendee_result)
                 );
               } catch (JSONException e) {
                 e.printStackTrace();
