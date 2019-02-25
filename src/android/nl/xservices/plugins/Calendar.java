@@ -685,6 +685,7 @@ public class Calendar extends CordovaPlugin {
                             new JSONObject()
                                     .put("event_id", attendee_cursor.getString(attendee_cursor.getColumnIndex(CalendarContract.Attendees.EVENT_ID)))
                                     .put("name", attendee_cursor.getString(attendee_cursor.getColumnIndex(CalendarContract.Attendees.ATTENDEE_NAME)))
+                                    .put("email", attendee_cursor.getString(attendee_cursor.getColumnIndex(CalendarContract.Attendees.ATTENDEE_EMAIL)))
                                     .put("type", attendee_cursor.getString(attendee_cursor.getColumnIndex(CalendarContract.Attendees.ATTENDEE_TYPE)))
                                     .put("relationship", attendee_cursor.getString(attendee_cursor.getColumnIndex(CalendarContract.Attendees.ATTENDEE_RELATIONSHIP)))
                                     .put("status", attendee_cursor.getInt(attendee_cursor.getColumnIndex(CalendarContract.Attendees.ATTENDEE_STATUS)))
